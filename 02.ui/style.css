@@ -1,0 +1,14 @@
+/* Reset toàn bộ margin và padding */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Map full màn hình */
+#map {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
