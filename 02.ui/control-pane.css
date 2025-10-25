@@ -1,0 +1,139 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    height: 100vh;
+    background: #eef3f9;
+}
+
+.control-panel {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 270px;
+    background: linear-gradient(160deg, #ffffff 0%, #f3f7ff 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 18px;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.control-panel h3 {
+    text-align: center;
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    color: #2b3a67;
+}
+
+.row {
+    margin: 10px 0;
+}
+
+.label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+    color: #444;
+}
+
+.switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 26px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background-color: #0078ff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+select, input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+input:focus {
+    border-color: #0078ff;
+    box-shadow: 0 0 4px rgba(0, 120, 255, 0.5);
+}
+
+button {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+#findPathBtn {
+    background: #0078ff;
+    color: white;
+}
+
+#findPathBtn:hover {
+    background: #005fd1;
+}
+
+#refreshBtn {
+    background: #f44336;
+    color: white;
+}
+
+#refreshBtn:hover {
+    background: #d32f2f;
+}
+
+/* Hiệu ứng đang chọn điểm */
+.active-select {
+    border-color: #0078ff !important;
+    background-color: #e8f1ff;
+}
+
+.icon {
+    margin-right: 5px;
+    vertical-align: middle;
+}

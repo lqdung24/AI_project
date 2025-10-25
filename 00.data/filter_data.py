@@ -10,7 +10,7 @@ nodes = pd.read_csv("data/nodes.csv")
 edges = pd.read_csv("data/edges.csv")
 
 # loại bỏ cột thừa, thêm cột id
-if(not os.path.exists('data/edges_filterd.csv') or not os.path.exists('data/nodes_filterd.csv')):
+if not os.path.exists('data/edges_filtered.csv') or not os.path.exists('data/nodes_filtered.csv'):
     osmid_to_id = dict(zip(nodes['osmid'], nodes['id']))
 
     # Chuyển u,v sang id
@@ -18,13 +18,22 @@ if(not os.path.exists('data/edges_filterd.csv') or not os.path.exists('data/node
     edges['v'] = edges['v'].map(osmid_to_id)
 
     edges = edges[['u', 'v', 'length', 'name', 'oneway']]
-    nodes = nodes[['id', 'y', 'x', 'street_count']]
+    nodes = nodes[['id', 'y', 'x', 'street_count']] #name = tên phố
     nodes = nodes.rename(columns={"y": "lat", "x": "lng"})
-    edges.to_csv("./data/edges_filterd.csv", index=False)
-    nodes.to_csv("./data/nodes_filterd.csv", index=False)
+
+    id_to_name = dict(zip(edges['u'], edges['name']))
+    nodes['name'] = nodes['id'].map(id_to_name)
+    nodes['name'] = nodes['name'].fillna('')
+    nodes['name'] = nodes.apply(
+        lambda row: f"{round(row['lat'],2)},{round(row['lng'],2)}" if row['name'] == '' else row['name'],
+        axis=1
+    )
+
+    edges.to_csv("./data/edges_filtered.csv", index=False)
+    nodes.to_csv("./data/nodes_filtered.csv", index=False)
 else:
-    edges = pd.read_csv("./data/edges_filterd.csv")
-    nodes = pd.read_csv("./data/nodes_filterd.csv")
+    edges = pd.read_csv("./data/edges_filtered.csv")
+    nodes = pd.read_csv("./data/nodes_filtered.csv")
 
 #tạo ma trận kề để thực hiện thuật toán tìm kiếm
 if not os.path.exists('data/adj.pkl'):
@@ -35,6 +44,7 @@ if not os.path.exists('data/adj.pkl'):
         adj[u][v] = w
         if(not oneway):
             adj[v][u] = w
+
     # lưu ra file
     with open("data/adj.pkl", 'wb') as f:
         pickle.dump(adj, f)

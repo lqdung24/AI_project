@@ -9,17 +9,18 @@
 
     <!-- CSS tùy chỉnh -->
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="control-pane.css"/>
 </head>
 <body>
-<div id="map"></div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<!-- CSV parser -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-<!-- Script map -->
-<script type="module" src="js/map.js"></script>
-<script type="module" src="js/event_listener.js"></script>
-<script type="module" src="js/draw.js"></script>
+    <div id="map" class="map"></div>
+    <div id="control-panel"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- CSV parser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

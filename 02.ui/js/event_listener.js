@@ -1,22 +1,32 @@
 import {map} from "./map.js";
-import {API_URL} from "./config.js";
+import {
+    handleChangeAlgorithm,
+    handleChangeMode,
+    handleFindPathBtn,
+    handleNode,
+    handleRefresh,
+    setEnd,
+    setStart
+} from "./functions.js";
 
-map.on('click', function(e) {
-    const {lat, lng} = e.latlng;
+export function initEventListener() {
+    map.on('click', handleNode);
 
-    fetch(`${API_URL}/point`, {
-        method: "POST",
-            headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat: lat, lng: lng })
-        })
-        .then(response => response.json())
-        .then(response => {
-            const node = response.data;
-            console.log(response)
-            L.marker([node.lat, node.lng])
-                .addTo(map)
-                .bindPopup(`ID: ${node.id}, Streets: ${node.street_count}`)
-                .openPopup();
-        })
-        .catch(err => console.error("Fetch error:", err));
-});
+    document.getElementById('startPoint')
+            .addEventListener('focus', setStart);
+
+    document.getElementById('endPoint')
+            .addEventListener('focus', setEnd);
+
+    document.getElementById('algorithm')
+        .addEventListener('change', handleChangeAlgorithm);
+
+    document.getElementById('refreshBtn')
+        .addEventListener('click', handleRefresh);
+
+    document.getElementById('modeSwitch')
+        .addEventListener('change', handleChangeMode);
+
+    document.getElementById('findPathBtn')
+        .addEventListener('click', handleFindPathBtn);
+}

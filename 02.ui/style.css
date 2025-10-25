@@ -6,6 +6,10 @@ html, body {
     padding: 0;
 }
 
+.map{
+    z-index: 1;
+}
+
 /* Map full màn hình */
 #map {
     height: 100%;
