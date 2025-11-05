@@ -14,6 +14,42 @@ export async function getNearestPoint(node) {
     return resData.data
 }
 
+export async function refreshGuest(data){
+    const res = await fetch(`${API_URL}/guest/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({'data': data})
+    }).catch(err => console.error("Fetch error:", err));
+
+    const resData = await res.json()
+    console.log(resData.data)
+    return resData.data
+}
+
+
+export async function findPath(data){
+    const res = await fetch(`${API_URL}/guest/find-path`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({'data': data})
+    }).catch(err => console.error("Fetch error:", err));
+
+    const resData = await res.json()
+    console.log(resData.data)
+    return resData.data
+}
+
+export async function updateData(data){
+    const res = await fetch(`${API_URL}/guest/update-data`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({'data': data})
+    }).catch(err => console.error("Fetch error:", err));
+
+    const resData = await res.json()
+    console.log(resData.data)
+    return resData.data
+}
 export async function getBoundary(){
     fetch(`${API_URL}/data/boundary`)
         .then(response => response.json())
@@ -39,10 +75,10 @@ export async function getNodes(){
             results.data.forEach(n => {
                 if(n.x && n.y) {
                     L.circleMarker([parseFloat(n.y), parseFloat(n.x)], {
-                        radius: 3,
+                        radius: 2,
                         color: "red",
                         fillColor: "red",
-                        fillOpacity: 0.7
+                        fillOpacity: 0.3
                     })
                         .bindPopup(`Node ID: ${n.osmid}`)
                         .addTo(map);

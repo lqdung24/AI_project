@@ -29,4 +29,5 @@ export function initEventListener() {
 
     document.getElementById('findPathBtn')
         .addEventListener('click', handleFindPathBtn);
+
 }

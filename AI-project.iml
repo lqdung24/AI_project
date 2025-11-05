@@ -7,5 +7,9 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.13 (AI-project)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="leaflet" level="application" />
+    <orderEntry type="library" name="leaflet-color-markers" level="application" />
+    <orderEntry type="library" name="PapaParse" level="application" />
+    <orderEntry type="library" name="toastify-js" level="application" />
   </component>
 </module>

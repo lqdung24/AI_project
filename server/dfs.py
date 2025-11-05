@@ -1,4 +1,5 @@
-from server.data import graph
+from server.data import get_adj, get_cost
+
 
 def dfs_algo(start, end, graph):
     visited = set()
@@ -13,12 +14,12 @@ def dfs_algo(start, end, graph):
         if u == end:
             return True
 
-        for v in graph[u].keys():
+        for v in get_adj(u):
             if v not in visited:
-                length += graph[u][v]
+                length += get_cost(u, v)
                 if dfs(v):
                     return True
-                length -= graph[u][v]
+                length -= get_cost(u, v)
         path.pop()  # backtrack
         return False
 

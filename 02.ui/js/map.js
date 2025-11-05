@@ -10,7 +10,7 @@ export const map = L.map('map', {
 });
 
 export function load_map(){
-    console.log("load map")
+    console.log("load main")
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap',
         maxZoom: maxZoom
