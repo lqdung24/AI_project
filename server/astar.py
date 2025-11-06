@@ -43,4 +43,4 @@ def astar(start, end, graph):
                 heapq.heappush(open_set, (f_score, neighbor))
 
     # Không tìm được đường
-    return None
+    return [], 0

@@ -5,4 +5,4 @@ import {initEventListener} from "./event_listener.js";
 loadHTML().then(() => {
     initEventListener();
     load_map();
-})
+});

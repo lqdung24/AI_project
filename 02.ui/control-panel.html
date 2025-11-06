@@ -1,7 +1,6 @@
-<div class="control-panel">
-  <h3>🧭 Bảng điều khiển</h3>
-
-  <!-- 1. Công tắc chế độ -->
+<!-- GUEST PANEL -->
+<div id="guestPanel" class="control-panel">
+  <h3>🧭 Bảng điều khiển (Guest)</h3>
   <div class="row switch-container">
     <span>Guest</span>
     <label class="switch">
@@ -11,9 +10,8 @@
     <span>Admin</span>
   </div>
 
-  <!-- 2. Chọn thuật toán -->
   <div class="row">
-    <label class="label"><i class="icon lucide lucide-cpu"></i>Thuật toán</label>
+    <label class="label">Thuật toán</label>
     <select id="algorithm">
       <option disabled selected>Chọn thuật toán</option>
       <option value="dijkstra">Dijkstra</option>
@@ -23,26 +21,86 @@
     </select>
   </div>
 
-  <!-- 3. Điểm bắt đầu -->
   <div class="row">
-    <label class="label"><i class="icon lucide lucide-map-pin"></i>Điểm bắt đầu</label>
-    <input type="text" id="startPoint" placeholder="Nhấn để chọn trên bản đồ" readonly>
+    <label class="label">Điểm bắt đầu</label>
+    <div class="input-with-marker">
+      <img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png" class="leaflet-marker start-marker">
+      <input type="text" id="startPoint" placeholder="Nhấn để chọn trên bản đồ" readonly>
+    </div>
   </div>
 
-  <!-- 4. Điểm kết thúc -->
   <div class="row">
-    <label class="label"><i class="icon lucide lucide-flag"></i>Điểm kết thúc</label>
-    <input type="text" id="endPoint" placeholder="Nhấn để chọn trên bản đồ" readonly>
+    <label class="label">Điểm kết thúc</label>
+    <div class="input-with-marker">
+      <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" class="leaflet-marker end-marker">
+      <input type="text" id="endPoint" placeholder="Nhấn để chọn trên bản đồ" readonly>
+    </div>
   </div>
 
-  <!-- 5. Nút Tìm đường -->
-  <div class="row">
-    <button id="findPathBtn"><i class="icon lucide lucide-navigation"></i>Tìm đường</button>
+  <div class="row info">
+    <p>🛣️ Chiều dài: <span id="pathLength">-</span></p>
+    <p>⏱️ Thời gian: <span id="pathTime">-</span></p>
   </div>
 
-  <!-- 6. Nút Làm mới -->
   <div class="row">
-    <button id="refreshBtn"><i class="icon lucide lucide-refresh-cw"></i>Làm mới</button>
+    <button id="findPathBtn">Tìm đường</button>
+  </div>
+
+  <div class="row">
+    <button id="refreshBtn">Làm mới</button>
   </div>
 </div>
+
+<!-- Bảng điều khiển Admin -->
+<div id="adminPanel" class="control-panel">
+  <h3>⚙️ Bảng điều khiển (Admin)</h3>
+  <div class="row switch-container">
+    <span>Guest</span>
+    <label class="switch">
+      <input type="checkbox" id="modeSwitchAdmin" checked>
+      <span class="slider"></span>
+    </label>
+    <span>Admin</span>
+  </div>
+
+  <div class="row">
+    <button id="blockRoadBtn" class="toggle-btn">🚧 Cấm đường</button>
+    <div id="blockRoadPanel" class="submenu hidden">
+      <ul id="blockedList"></ul>
+      <button id="createBlockZone">+ Tạo vùng cấm</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="floodBtn" class="toggle-btn">🌊 Ngập lụt</button>
+    <div id="floodPanel" class="submenu hidden">
+      <ul id="floodList"></ul>
+      <button id="createFloodZone">+ Tạo vùng ngập</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="trafficJamBtn" class="toggle-btn">🚗 Tắc đường</button>
+    <div id="trafficPanel" class="submenu hidden">
+      <ul id="trafficList"></ul>
+      <button id="createTrafficZone">+ Tạo vùng tắc</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="oneWayBtn" class="toggle-btn">➡️ Đường 1 chiều</button>
+    <div id="onewayPanel" class="submenu hidden">
+      <ul id="onewayList"></ul>
+      <button id="createOnewayZone">+ Tạo vùng 1 chiều</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="resetAll">🗑️ Reset tất cả</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+<script src="./js/script.js"></script>
 

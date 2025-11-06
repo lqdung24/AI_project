@@ -69,13 +69,16 @@ def find_path():
     print(data)
     if data['algorithm'] == 'dfs':
         path, length = dfs_algo(data['start']['id'], data['end']['id'], graph)
+    elif data['algorithm'] == 'astar':
+        path, length = astar(data['start']['id'], data['end']['id'], graph)
+    elif data['algorithm'] == 'bfs':
+        print(f'algorithm {data['algorithm']} not installed')
+    elif data['algorithm'] == 'dijkstra':
+        print(f'algorithm {data['algorithm']} not installed')
     else:
-        if data['algorithm'] == 'astar':
-            path, length = astar(data['start']['id'], data['end']['id'], graph)
-        else:
-            print(f'algorithm {data['algorithm']} not installed')
+        print(f'algorithm {data['algorithm']} not installed')
 
-    if path is None:
+    if path is []:
         return None
 
     path2 = []

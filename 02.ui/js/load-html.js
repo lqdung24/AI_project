@@ -5,5 +5,7 @@ async function loadFileHTML(id, file) {
 }
 
 export async function loadHTML(){
-    await loadFileHTML('control-panel', 'control-panel.html')
+    // await loadFileHTML('control-panel', 'control-panel.html')
+    await loadFileHTML('guest-pane', 'guest-pane.html')
+    await loadFileHTML('admin-pane', 'admin-pane.html')
 }

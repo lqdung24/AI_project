@@ -38,7 +38,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-3. Kiểm tra log console để biết cổng mà server lắng nghe (ví dụ: `http://127.0.0.1:5000` hoặc `http://127.0.0.1:8000`).
+3. Cổng mà server lắng nghe `http://127.0.0.1:8000`.
 
 
 ## Mở `index.html` trong trình duyệt
@@ -55,8 +55,9 @@ Từ thư mục chứa `index.html`:
 
 ```bash
 # Python 3
-python -m http.server 8000
-# Mở http://127.0.0.1:8000/index.html
+cd ./02.ui
+python -m http.server 8080
+# Mở http://127.0.0.1:8080/index.html
 ```
 
 Hoặc dùng `http.server` của Python 3 cho Windows/macOS/linux.

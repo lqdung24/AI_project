@@ -27,6 +27,6 @@ def dfs_algo(start, end, graph):
     if found:
         return path, round(length,0)
     else:
-        return None
+        return [], 0
 
 # print(dfs_algo(1, 4, graph))

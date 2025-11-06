@@ -112,7 +112,24 @@ async function refresh(){
 
 export function handleChangeMode(e){
     data.mode = e.target.checked ? 'Admin' : 'Guest';
+    const guestPanel = document.getElementById("guestPanel");
+    const adminPanel = document.getElementById("adminPanel");
+
+    if (!guestPanel || !adminPanel) {
+        console.log("it null???")
+        return
+    }
+
     updateData(data)
+    if (data.mode == "Admin") {
+        // Admin mode
+        guestPanel.classList.add("hidden");
+        adminPanel.classList.remove("hidden");
+    } else {
+        // Guest mode
+        guestPanel.classList.remove("hidden");
+        adminPanel.classList.add("hidden");
+    }
     console.log(data.mode);
 }
 
@@ -133,20 +150,13 @@ export async function handleFindPathBtn(e){
         message = 'Vui lòng chọn điểm kết thúc'
     }
     if(message !== '') {
-        Toastify({
-            text: message,
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            style: {
-                background: "#f56565",  // ✅ dùng 'style.background' thay vì 'backgroundColor'
-                color: "white",
-                borderRadius: "8px"
-            }
-        }).showToast();
+        showAlert(message)
     }else{
         let backendData = await findPath(data)
-        console.log(backendData.path)
+        if(backendData.length === 0) {
+            showAlert("Không tìm thấy đường đi")
+            return
+        }
         if(pathDraw) pathDraw.remove();
         pathDraw = L.polyline(backendData.path, {
             color: 'blue',
@@ -164,4 +174,18 @@ export function setStart(e){
 export function setEnd(e){
     data.selecting = 'end'
     console.log(data.selecting);
+}
+
+function showAlert(message){
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: "top",
+        position: "center",
+        style: {
+            background: "#f56565",  // ✅ dùng 'style.background' thay vì 'backgroundColor'
+            color: "white",
+            borderRadius: "8px"
+        }
+    }).showToast();
 }

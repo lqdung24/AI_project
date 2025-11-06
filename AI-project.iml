@@ -11,5 +11,6 @@
     <orderEntry type="library" name="leaflet-color-markers" level="application" />
     <orderEntry type="library" name="PapaParse" level="application" />
     <orderEntry type="library" name="toastify-js" level="application" />
+    <orderEntry type="library" name="leaflet-draw" level="application" />
   </component>
 </module>
