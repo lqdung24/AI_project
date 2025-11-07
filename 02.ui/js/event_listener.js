@@ -1,14 +1,21 @@
 import {map} from "./map.js";
 import {
+    drawPolygon,
     handleChangeAlgorithm,
     handleChangeMode,
     handleFindPathBtn,
     handleNode,
-    handleRefresh,
+    handleRefresh, renderZoneList,
     setEnd,
-    setStart
+    setStart, zones,
+    removeZone
 } from "./functions.js";
 
+
+export let guestPanel
+export let adminPanel
+export let switchGuest
+export let switchAdmin
 export function initEventListener() {
     map.on('click', handleNode);
 
@@ -24,33 +31,57 @@ export function initEventListener() {
     document.getElementById('refreshBtn')
         .addEventListener('click', handleRefresh);
 
-    document.getElementById('modeSwitch')
+    document.getElementById('modeSwitchGuest')
+        .addEventListener('change', handleChangeMode);
+
+    document.getElementById('modeSwitchAdmin')
         .addEventListener('change', handleChangeMode);
 
     document.getElementById('findPathBtn')
         .addEventListener('click', handleFindPathBtn);
 
-    const guestPanel = document.getElementById('guestPanel');
-    const adminPanel = document.getElementById('adminPanel');
-    const switchGuest = document.getElementById('modeSwitch');
-    const switchAdmin = document.getElementById('modeSwitchAdmin');
+    guestPanel = document.getElementById('guestPanel');
+    adminPanel = document.getElementById('adminPanel');
+    switchGuest = document.getElementById('modeSwitchGuest');
+    switchAdmin = document.getElementById('modeSwitchAdmin');
 
-// Khi bật sang admin
-    switchGuest.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            guestPanel.style.display = 'none';
-            adminPanel.style.display = 'block';
-        }
-        switchAdmin.checked = true;
+    guestPanel.style.display = 'block';
+    adminPanel.style.display = 'none';
+
+    document.querySelectorAll(".toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const active = btn.classList.toggle("active");
+            const panel = btn.nextElementSibling;
+            if (panel) panel.classList.toggle("hidden", !active);
+
+            // Ẩn các panel khác
+            document.querySelectorAll(".toggle-btn").forEach(b => {
+                if (b !== btn) {
+                    b.classList.remove("active");
+                    const p = b.nextElementSibling;
+                    if (p) p.classList.add("hidden");
+                }
+            });
+        });
     });
 
-// Khi tắt admin quay về guest
-    switchAdmin.addEventListener('change', (e) => {
-        if (!e.target.checked) {
-            adminPanel.style.display = 'none';
-            guestPanel.style.display = 'block';
-        }
-        switchGuest.checked = false;
-    });
+    document.getElementById("createBlockZone")
+        .addEventListener("click", () => drawPolygon("block"));
+    document.getElementById("createFloodZone")
+        .addEventListener("click", () => drawPolygon("flood"));
+    document.getElementById("createTrafficZone")
+        .addEventListener("click", () => drawPolygon("traffic"));
+    document.getElementById("createOnewayZone")
+        .addEventListener("click", () => drawPolygon("oneway"));
+
+    document.getElementById("resetAdmin")
+        .addEventListener("click", () => {
+            Object.keys(zones).forEach(type => {
+                zones[type].forEach(z => map.removeLayer(z.layer));
+                zones[type] = [];
+                renderZoneList(type);
+            });
+        });
+    window.removeZone = removeZone;
 
 }

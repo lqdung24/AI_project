@@ -2,29 +2,24 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Bản đồ phường</title>
+    <title>Kim Lien's map</title>
 
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- CSS tùy chỉnh -->
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="control-pane.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
 </head>
 <body>
-
     <div id="map" class="map"></div>
-    <div id="guestPanel"></div>
-    <div id="adminPanel"></div>
-
-    <!-- CSV parser -->
+    <div id="guest-pane"></div>
+    <div id="admin-pane"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://rawcdn.githack.com/pointhi/leaflet-color-markers/master/js/leaflet-color-markers.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="js/main.js"></script>
-    <script src="./js/script.js"></script>
 </body>
 </html>

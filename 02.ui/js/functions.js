@@ -1,5 +1,6 @@
 import {findPath, getNearestPoint, refreshGuest, updateData} from "./api.js";
 import {map} from "./map.js";
+import {adminPanel, guestPanel, switchAdmin, switchGuest} from "./event_listener.js";
 
 const redIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -35,6 +36,20 @@ let data =
     'selecting': ''
 }
 
+export const zones = {
+    block: [],
+    flood: [],
+    traffic: [],
+    oneway: []
+};
+
+// ===== Màu polygon theo loại =====
+export const zoneColors = {
+    block: "#ff4d4d",
+    flood: "#4da6ff",
+    traffic: "#ffcc00",
+    oneway: "#66cc66"
+};
 // điểm trên bản đồ
 let startMarker;
 let endMarker;
@@ -112,23 +127,20 @@ async function refresh(){
 
 export function handleChangeMode(e){
     data.mode = e.target.checked ? 'Admin' : 'Guest';
-    const guestPanel = document.getElementById("guestPanel");
-    const adminPanel = document.getElementById("adminPanel");
-
     if (!guestPanel || !adminPanel) {
         console.log("it null???")
         return
     }
 
     updateData(data)
-    if (data.mode == "Admin") {
-        // Admin mode
-        guestPanel.classList.add("hidden");
-        adminPanel.classList.remove("hidden");
-    } else {
-        // Guest mode
-        guestPanel.classList.remove("hidden");
-        adminPanel.classList.add("hidden");
+    if (e.target.checked) {
+        guestPanel.style.display = 'none';
+        adminPanel.style.display = 'block';
+        switchAdmin.checked = true;
+    }else{
+        adminPanel.style.display = 'none';
+        guestPanel.style.display = 'block';
+        switchGuest.checked = false;
     }
     console.log(data.mode);
 }
@@ -188,4 +200,45 @@ function showAlert(message){
             borderRadius: "8px"
         }
     }).showToast();
+}
+
+export function drawPolygon(type) {
+    const drawControl = new L.Draw.Polygon(map);
+    drawControl.enable();
+
+    map.once(L.Draw.Event.CREATED, (e) => {
+        const layer = e.layer;
+        layer.setStyle({ color: zoneColors[type], fillOpacity: 0.4 });
+        layer.addTo(map);
+
+        const id = Date.now();
+        zones[type].push({ id, layer });
+        renderZoneList(type);
+    });
+}
+
+export function renderZoneList(type) {
+    const listId = {
+        block: "blockedList",
+        flood: "floodList",
+        traffic: "trafficList",
+        oneway: "onewayList"
+    }[type];
+
+    const list = document.getElementById(listId);
+    list.innerHTML = "";
+    zones[type].forEach(z => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${type.toUpperCase()} #${z.id}</span><button onclick="removeZone('${type}', ${z.id})">Xóa</button>`;
+        list.appendChild(li);
+    });
+}
+
+export function removeZone(type, id) {
+    const idx = zones[type].findIndex(z => z.id === id);
+    if (idx !== -1) {
+        map.removeLayer(zones[type][idx].layer);
+        zones[type].splice(idx, 1);
+        renderZoneList(type);
+    }
 }
