@@ -1,9 +1,12 @@
 import os
-import time
+from array import array
 from collections import defaultdict
 from scipy.spatial import KDTree
 import pickle
 import pandas as pd
+from rtree import index
+from shapely.geometry import Point, Polygon
+
 
 # Đọc CSV
 nodes = pd.read_csv("data/nodes.csv")
@@ -17,8 +20,9 @@ if not os.path.exists('data/edges_filtered.csv') or not os.path.exists('data/nod
     edges['u'] = edges['u'].map(osmid_to_id)
     edges['v'] = edges['v'].map(osmid_to_id)
 
-    edges = edges[['u', 'v', 'length', 'name', 'oneway']]
-    nodes = nodes[['id', 'y', 'x', 'street_count']] #name = tên phố
+    edges = edges[['u', 'v', 'length', 'name', 'geometry']]
+    edges['id'] =edges.index
+    nodes = nodes[['id', 'y', 'x']] #name = tên phố
     nodes = nodes.rename(columns={"y": "lat", "x": "lng"})
 
     id_to_name = dict(zip(edges['u'], edges['name']))
@@ -39,21 +43,13 @@ else:
 if not os.path.exists('data/adj.pkl'):
     #mất 158 mili giây để tạo ma trận kề
     adj = defaultdict(dict)
-    for _, row in edges.iterrows():
-        u, v, w, oneway = row['u'], row['v'], row['length'], row['oneway']
-        adj[u][v] = w
-        if(not oneway):
-            adj[v][u] = w
+    for idx, row in edges.iterrows():
+        u, v, cur_w = int(row['u']), int(row['v']), row['length']
+        default_w = cur_w
+        adj[u][v] = array('d', [cur_w, default_w, idx])
 
-    # lưu ra file
     with open("data/adj.pkl", 'wb') as f:
         pickle.dump(adj, f)
-
-with open("data/adj.pkl", 'rb') as f:
-    adj2 = pickle.load(f)
-from pprint import pprint
-pprint(adj2)
-
 
 # tạo kd tree để tìm điểm gần nhất với O(log n)
 if not os.path.exists('./data/kdtree.pkl'):
@@ -68,7 +64,13 @@ if not os.path.exists('./data/kdtree.pkl'):
 #read mất 100 micro giây
 with open("./data/kdtree.pkl", "rb") as f:
     tree2 = pickle.load(f)
-
-
 #   dữ liệu vào của hàm tìm đường: point (lat, lng), start_point, end_point
 #   dữ liệu ra: chuỗi các id của các node sẽ đi qua (theo thứ tự từ start -> end)
+
+# tạo r-tree để tìm tập các 'candidate' nằm trong polygon với O(log N)
+if not os.path.exists('./data/rtree.idx'):
+    p = index.Property()
+    p.storage = index.RT_Disk  # dùng lưu file
+    rtree = index.Index('./data/rtree', properties=p)
+    for row in nodes.itertuples(index=False):
+        rtree.insert(row.id, (row.lat, row.lng, row.lat, row.lng))

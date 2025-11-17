@@ -1,6 +1,5 @@
 from server.data import get_adj, get_cost
 
-
 def dfs_algo(start, end, graph):
     visited = set()
     path = [] # chứa id các node

@@ -5,10 +5,10 @@ import {
     handleChangeMode,
     handleFindPathBtn,
     handleNode,
-    handleRefresh, renderZoneList,
+    handleRefresh,
     setEnd,
-    setStart, zones,
-    removeZone
+    setStart,
+    removeZone, edgeUIHandle, nodeUIHandle, resetAdmin, buttonClickAdmin
 } from "./functions.js";
 
 
@@ -50,19 +50,8 @@ export function initEventListener() {
 
     document.querySelectorAll(".toggle-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            const active = btn.classList.toggle("active");
-            const panel = btn.nextElementSibling;
-            if (panel) panel.classList.toggle("hidden", !active);
-
-            // Ẩn các panel khác
-            document.querySelectorAll(".toggle-btn").forEach(b => {
-                if (b !== btn) {
-                    b.classList.remove("active");
-                    const p = b.nextElementSibling;
-                    if (p) p.classList.add("hidden");
-                }
-            });
-        });
+            buttonClickAdmin(btn);
+        })
     });
 
     document.getElementById("createBlockZone")
@@ -75,13 +64,14 @@ export function initEventListener() {
         .addEventListener("click", () => drawPolygon("oneway"));
 
     document.getElementById("resetAdmin")
-        .addEventListener("click", () => {
-            Object.keys(zones).forEach(type => {
-                zones[type].forEach(z => map.removeLayer(z.layer));
-                zones[type] = [];
-                renderZoneList(type);
-            });
-        });
-    window.removeZone = removeZone;
+        .addEventListener("click", resetAdmin);
 
+    document.getElementById("toggleEdgeGuest")
+        .addEventListener("change", (e) => edgeUIHandle(e, 'guest'))
+    document.getElementById("toggleNodeGuest")
+        .addEventListener("change", (e) => nodeUIHandle(e, 'guest'))
+    document.getElementById("toggleEdgeAdmin")
+        .addEventListener("change", (e) => edgeUIHandle(e, 'admin'))
+    document.getElementById("toggleNodeAdmin")
+        .addEventListener("change", (e) => nodeUIHandle(e, 'admin'))
 }

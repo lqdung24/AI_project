@@ -421,3 +421,16 @@ input:checked + .slider:before { transform: translateX(26px); }
     /* Hiệu ứng glow "outline" hiện đại */
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.switch-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

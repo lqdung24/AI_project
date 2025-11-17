@@ -1,6 +1,17 @@
-import {findPath, getNearestPoint, refreshGuest, updateData} from "./api.js";
+import {
+    delete_zone,
+    edgePolyLines,
+    findPath,
+    getData,
+    getNearestPoint,
+    nodeLayer,
+    postBoundary,
+    refreshGuest,
+    sendData
+} from "./api.js";
 import {map} from "./map.js";
 import {adminPanel, guestPanel, switchAdmin, switchGuest} from "./event_listener.js";
+import {edgeLayer} from "./api.js";
 
 const redIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -33,15 +44,21 @@ let data =
     },
     'mode': 'guest',
     'algorithm': '',
-    'selecting': ''
+    'selecting': '',
+    'zones': {
+        block: new Map(),
+        flood: new Map(),
+        traffic: new Map(),
+        oneway: new Map()
+    }
 }
 
-export const zones = {
-    block: [],
-    flood: [],
-    traffic: [],
-    oneway: []
-};
+export let draw_zones= {
+    block: new Map(),
+    flood: new Map(),
+    traffic: new Map(),
+    oneway: new Map()
+}
 
 // ===== Màu polygon theo loại =====
 export const zoneColors = {
@@ -50,11 +67,13 @@ export const zoneColors = {
     traffic: "#ffcc00",
     oneway: "#66cc66"
 };
-// điểm trên bản đồ
+
 let startMarker;
 let endMarker;
 let pathDraw;
-
+export async function __init__(){
+    data = await getData()
+}
 export function handleNode(e){
     const {lat, lng} = e.latlng;
     if(data.selecting === 'start'){
@@ -62,7 +81,7 @@ export function handleNode(e){
         data.start['lng'] = lng;
         getNearestPoint(data.start).then(node => {
             data.start = node
-            name = `Id: ${data.start['id']}, ${data.start['name']}`
+            name = `ID: ${data.start['id']}, ${data.start['name']}`
 
             if(startMarker) startMarker.remove();
             startMarker = L.marker([data.start['lat'], data.start['lng']])
@@ -117,7 +136,8 @@ async function refresh(){
     if(pathDraw) pathDraw.remove();
 
     data.mode = 'guest'
-    document.getElementById('modeSwitch').checked = false
+    document.getElementById('modeSwitchGuest').checked = false
+    document.getElementById('modeSwitchAdmin').checked = false
     //xu li voi backend
     let tmp = await refreshGuest(data);
     if(tmp !== null){
@@ -127,28 +147,23 @@ async function refresh(){
 
 export function handleChangeMode(e){
     data.mode = e.target.checked ? 'Admin' : 'Guest';
-    if (!guestPanel || !adminPanel) {
-        console.log("it null???")
-        return
-    }
 
-    updateData(data)
     if (e.target.checked) {
         guestPanel.style.display = 'none';
         adminPanel.style.display = 'block';
         switchAdmin.checked = true;
+        data.selecting = ''
     }else{
         adminPanel.style.display = 'none';
         guestPanel.style.display = 'block';
         switchGuest.checked = false;
     }
-    console.log(data.mode);
+    sendData(data)
 }
 
 export function handleChangeAlgorithm(e) {
     data.algorithm = e.target.value; // Lấy loại thuật toán được chọn
-    updateData(data)
-    console.log("Thuật toán được chọn:", data.algorithm);
+    sendData(data)
 }
 
 
@@ -180,12 +195,10 @@ export async function handleFindPathBtn(e){
 
 export function setStart(e){
     data.selecting = 'start';
-    console.log(data.selecting);
 }
 
 export function setEnd(e){
     data.selecting = 'end'
-    console.log(data.selecting);
 }
 
 function showAlert(message){
@@ -202,18 +215,28 @@ function showAlert(message){
     }).showToast();
 }
 
-export function drawPolygon(type) {
+//admin functions
+export async function drawPolygon(type) {
     const drawControl = new L.Draw.Polygon(map);
     drawControl.enable();
 
-    map.once(L.Draw.Event.CREATED, (e) => {
-        const layer = e.layer;
-        layer.setStyle({ color: zoneColors[type], fillOpacity: 0.4 });
-        layer.addTo(map);
+    map.once(L.Draw.Event.CREATED, async (e) => {
+        const layer = e.layer
+        layer.setStyle({color: zoneColors[type], fillOpacity: 0.4})
+        layer.addTo(map)
+        let id = String(Date.now()%1000)
+        while(draw_zones[type].has(id)) id = String(Date.now()%1000)
+        draw_zones[type].set(id, layer)
+        renderZoneList(type)
 
-        const id = Date.now();
-        zones[type].push({ id, layer });
-        renderZoneList(type);
+        const boundary = layer.getLatLngs()[0]
+        await sendData(data)
+        const selected_edges = await postBoundary({boundary, type, id})
+        data = await getData()
+        console.log(data)
+        selected_edges.forEach(edge => {
+            edgePolyLines[edge[2]].setStyle({color: "black", weight: 3});
+        });
     });
 }
 
@@ -227,18 +250,82 @@ export function renderZoneList(type) {
 
     const list = document.getElementById(listId);
     list.innerHTML = "";
-    zones[type].forEach(z => {
+    draw_zones[type].forEach((z, id) => {
         const li = document.createElement("li");
-        li.innerHTML = `<span>${type.toUpperCase()} #${z.id}</span><button onclick="removeZone('${type}', ${z.id})">Xóa</button>`;
+        const span = document.createElement("span");
+        span.textContent = `${type.toUpperCase()} #${id}`;
+        li.appendChild(span);
+        const btn = document.createElement("button");
+        btn.textContent = "Xóa";
+        btn.addEventListener("click", () => {
+            removeZone(type, id);
+        });
+        li.appendChild(btn);
         list.appendChild(li);
     });
 }
 
-export function removeZone(type, id) {
-    const idx = zones[type].findIndex(z => z.id === id);
-    if (idx !== -1) {
-        map.removeLayer(zones[type][idx].layer);
-        zones[type].splice(idx, 1);
-        renderZoneList(type);
+
+export async function removeZone(type, id) {
+    map.removeLayer(draw_zones[type].get(id));
+    draw_zones[type].delete(id)
+    renderZoneList(type);
+    console.log(data.zones[type])
+    let selected_edges = data.zones[type][id][1]
+    selected_edges.forEach(edge => {
+        edgePolyLines[edge[2]].setStyle({color: "green", weight: 3});
+    });
+    data.zones = await delete_zone({id, type})
+}
+
+export function edgeUIHandle(e, mode){
+    if(e.target.checked){
+        edgeLayer.addTo(map)
+    }else{
+        map.removeLayer(edgeLayer)
     }
+    if(mode === 'admin'){
+        document.getElementById('toggleEdgeGuest')
+            .checked = e.target.checked
+    }else{
+        document.getElementById('toggleEdgeAdmin')
+            .checked = e.target.checked
+    }
+}
+
+export function nodeUIHandle(e, mode){
+    if(e.target.checked){
+        nodeLayer.addTo(map)
+    }else{
+        map.removeLayer(nodeLayer)
+    }
+    if(mode === 'admin'){
+        document.getElementById('toggleNodeGuest')
+            .checked = e.target.checked
+    }else{
+        document.getElementById('toggleNodeAdmin')
+            .checked = e.target.checked
+    }
+}
+
+export function resetAdmin(e){
+    Object.keys(draw_zones).forEach(type => {
+        draw_zones[type].forEach(z => map.removeLayer(z.layer));
+        draw_zones[type].clear();
+        renderZoneList(type);
+    });
+}
+
+export function buttonClickAdmin(btn){
+    const active = btn.classList.toggle("active");
+    const panel = btn.nextElementSibling;
+    if (panel) panel.classList.toggle("hidden", !active);
+
+    document.querySelectorAll(".toggle-btn").forEach(b => {
+        if (b !== btn) {
+            b.classList.remove("active");
+            const p = b.nextElementSibling;
+            if (p) p.classList.add("hidden");
+        }
+    });
 }

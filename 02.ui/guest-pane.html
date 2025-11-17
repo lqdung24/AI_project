@@ -1,6 +1,8 @@
 <!-- GUEST PANEL -->
 <div id="guestPanel" class="control-panel">
     <h3>🧭 Bảng điều khiển (Guest)</h3>
+
+    <!-- Chế độ Guest / Admin -->
     <div class="row switch-container">
         <span>Guest</span>
         <label class="switch">
@@ -10,6 +12,25 @@
         <span>Admin</span>
     </div>
 
+    <!-- Hiển thị Node / Edge -->
+    <div class="row switch-container" style="justify-content: space-between;">
+        <div class="switch-item">
+            <span>Node</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleNodeGuest" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="switch-item">
+            <span>Edge</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleEdgeGuest" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Thuật toán -->
     <div class="row">
         <label class="label">Thuật toán</label>
         <select id="algorithm">
@@ -21,6 +42,7 @@
         </select>
     </div>
 
+    <!-- Điểm bắt đầu -->
     <div class="row">
         <label class="label">Điểm bắt đầu</label>
         <div class="input-with-marker">
@@ -29,6 +51,7 @@
         </div>
     </div>
 
+    <!-- Điểm kết thúc -->
     <div class="row">
         <label class="label">Điểm kết thúc</label>
         <div class="input-with-marker">
@@ -37,11 +60,13 @@
         </div>
     </div>
 
+    <!-- Thông tin -->
     <div class="row info">
         <p>🛣️ Chiều dài: <span id="pathLength">-</span></p>
         <p>⏱️ Thời gian: <span id="pathTime">-</span></p>
     </div>
 
+    <!-- Nút chức năng -->
     <div class="row">
         <button id="findPathBtn">Tìm đường</button>
     </div>

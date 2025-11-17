@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 from server import service
 from server.respone import make_response
-from server.service import node_input, find_path, refresh_guest_service, data
+from server.service import node_input, find_path, refresh_guest_service, data, find_inside_edge, delete_zone
 
 app = Flask(__name__)
 CORS(app)
@@ -15,13 +15,19 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "../00.data/data")
 if not os.path.exists(DATA_DIR):
     print(f"Data directory ${DATA_DIR} not found.")
 
+@app.route('/data', methods=['POST'])
+def get_data():
+    #print(service.data)
+    return make_response(data=service.data)
+
 @app.route("/data/nodes", methods=["GET"])
 def get_nodes():
-    return send_from_directory(DATA_DIR, "nodes.csv")
+    #print(service.data)
+    return send_from_directory(DATA_DIR, "nodes_filtered.csv")
 
 @app.route("/data/edges", methods=["GET"])
 def get_edges():
-    return send_from_directory(DATA_DIR, "edges.csv")
+    return send_from_directory(DATA_DIR, "edges_filtered.csv")
 
 @app.route("/data/boundary", methods=["GET"])
 def get_boundary():
@@ -65,6 +71,23 @@ def update_data():
     frontend_data = req.get('data')
     service.data = frontend_data
     return make_response(data=service.data)
+
+@app.route("/admin/zones", methods=['POST'])
+def get_inside_nodes():
+    req = request.get_json()
+    result = find_inside_edge(req.get('data'))
+    print(service.data['zones'])
+    return make_response(data=result)
+
+@app.route('/admin/zones/', methods=['DELETE'])
+def delete_zones():
+    req = request.get_json()
+    id = req.get('data')['id']
+    type = req.get('data')['type']
+    result = delete_zone(id, type)
+    if result is None:
+        return make_response(message="zone not found", code=404)
+    return make_response(data=result)
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

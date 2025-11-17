@@ -1,5 +1,7 @@
+import math
+from shapely import Polygon, Point
 from server.astar import astar
-from server.data import kdtree, nodes, graph
+from server.data import kdtree, nodes, graph, rtree
 from server.dfs import dfs_algo
 from server.respone import make_response
 
@@ -30,7 +32,13 @@ data = {
         },
     'mode': 'guest',
     'algorithm': 'dijkstra',
-    'selecting': 'start'
+    'selecting': '',
+    'zones': {
+        'block': {},
+        'flood': {},
+        'traffic': {},
+        'oneway': {}
+    }
 }
 
 def node_input(node):
@@ -46,12 +54,10 @@ def node_input(node):
     if node['start'] is True:
         data['start'] = nearest
         data['start']['start'] = True
-        print(data['start'])
         return make_response(data=data['start'])
     else:
         data['end'] = nearest
         data['end']['start'] = False
-        print(data['end'])
         return make_response(data=data['end'])
 
 def refresh_guest_service(frontendData):
@@ -66,7 +72,6 @@ def refresh_guest_service(frontendData):
 def find_path():
     path = []
     length = 0
-    print(data)
     if data['algorithm'] == 'dfs':
         path, length = dfs_algo(data['start']['id'], data['end']['id'], graph)
     elif data['algorithm'] == 'astar':
@@ -87,8 +92,35 @@ def find_path():
         lng = nodes.iloc[node_id]['lng']
         path2.append([float(lat), float(lng)])
 
-    print(path2)
-
     return path2, length
 
 # find_path()
+
+def find_inside_edge(poly):
+    boundary = poly['boundary']
+    type = poly['type']
+    id = poly['id']
+    polygon_coords = [(p['lat'], p['lng']) for p in boundary]
+    poly = Polygon(polygon_coords)
+    candidate_ids = rtree.intersection(poly.bounds)
+    candidates = [nodes.iloc[p] for p in candidate_ids]
+    inside_nodes = {p['id'] for p in candidates if poly.contains(Point(p['lat'], p['lng']))}
+    selected_edges = []
+    for u in inside_nodes:
+        for v in graph[u]:
+            if v in inside_nodes:
+                selected_edges.append((int(u), int(v), graph[u][v][2]))
+                graph[u][v][0] = math.inf # nhân tạm cho 2
+    data['zones'][type][id] = (boundary, selected_edges)
+    return selected_edges
+
+def delete_zone(id, type):
+    zone = data['zones'][type].pop(id, None)
+    if zone is None:
+        return None
+    edges = zone[1]
+    for edge in edges:
+        u = edge[0]
+        v = edge[1]
+        graph[u][v][0] = graph[u][v][1]
+    return data['zones']

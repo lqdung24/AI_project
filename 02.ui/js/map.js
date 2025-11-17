@@ -1,6 +1,6 @@
 import {getBoundary, getEdges, getNodes} from "./api.js";
 
-const maxZoom = 18;
+const maxZoom = 19;
 const minZoom = 15;
 export const map = L.map('map', {
     center: [21.0278, 105.8342], // Tọa độ trung tâm (lat, lon)

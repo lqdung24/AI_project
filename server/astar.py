@@ -35,7 +35,7 @@ def astar(start, end, graph):
 
         # Duyệt các node kề
         for neighbor, cost in graph[current].items():
-            tentative_g = g_score[current] + cost
+            tentative_g = g_score[current] + cost[0]
             if tentative_g < g_score[neighbor]:
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g
