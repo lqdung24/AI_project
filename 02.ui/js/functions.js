@@ -192,6 +192,17 @@ export async function handleFindPathBtn(e){
         }).addTo(map);
         document.getElementById("pathLength")
             .textContent = `${backendData.length} m`
+        let time_unit = 'hours'
+        if(backendData.cost < 1){
+            backendData.cost *= 60;
+            time_unit = 'minutes'
+        }
+        if(backendData.cost < 1){
+            backendData.cost *= 60;
+            time_unit = 'seconds'
+        }
+        document.getElementById("pathTime")
+            .textContent = `${Math.round(backendData.cost)} ${time_unit}`
         console.log("da tim duong di")
     }
 }

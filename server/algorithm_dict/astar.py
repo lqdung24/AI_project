@@ -1,6 +1,6 @@
 import heapq
 import math
-from server.data import getLatLng, get_adj, get_cost
+from server.data import getLatLng, get_adj, get_cost, get_length
 
 
 def get_h(id, end_id):
@@ -21,18 +21,21 @@ def astar(start, end):
 
         if current == end:
             path = [current]
+            length = 0
             while current in came_from:
+                length += get_length(came_from[current], current)
                 current = came_from[current]
                 path.append(current)
+                #length += get_length(current, came_from[current])
             path.reverse()
 
             # Tổng độ dài đường đi
-            total_length = g_score[end]
-            return path, round(total_length, 2)
+            total_cost = g_score[end]
+            return path, round(length, 2), round(total_cost, 2)
 
         # Duyệt các node kề
-        for neighbor, cost in get_adj(current):
-            if cost[0] == math.inf:
+        for neighbor in get_adj(current):
+            if get_cost(current, neighbor) == math.inf:
                 continue
             tentative_g = g_score[current] + get_cost(current, neighbor)
             if tentative_g < g_score[neighbor]:
@@ -42,4 +45,4 @@ def astar(start, end):
                 heapq.heappush(open_set, (f_score, neighbor))
 
     # Không tìm được đường
-    return [], 0
+    return [], 0, -1

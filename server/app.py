@@ -54,12 +54,12 @@ def find():
     if not service.data['start']['set'] or not service.data['end']['set']:
         return make_response(message='Start or end point not selected',data={'start': data['start'], 'end': data['end']}, code=400)
 
-    path, length = find_path()
+    path, length, cost = find_path()
 
     if path is None:
         return make_response(message='Cannot find path', code=404)
 
-    return make_response(message='Path found', data={'path': path, 'length': length})
+    return make_response(message='Path found', data={'path': path, 'length': length, 'cost': cost/25000})
 
 @app.route("/guest/refresh", methods=['POST'])
 def refresh_guest():

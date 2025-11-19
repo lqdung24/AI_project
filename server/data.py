@@ -11,7 +11,7 @@ nodes = pd.read_csv("../00.data/data/nodes_filtered.csv")
 
 with open("../00.data/data/adj.pkl", 'rb') as f:
     graph = pickle.load(f)
-pprint(graph)
+
 rtree = index.Index("../00.data/data/rtree")
 
 coeff_value = [1<<p for p in range(6)]
@@ -24,7 +24,7 @@ def get_edge_id(u, v):
     return graph[u][v][6]
 
 def get_adj(id_):
-    return graph[id_].items()
+    return graph[id_].keys()
 
 def get_cost(start, end):
     if graph[start][end][1] or graph[start][end][4]:

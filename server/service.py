@@ -1,11 +1,8 @@
-import math
 from collections import defaultdict
-
 from shapely import Polygon, Point
-from server.astar import astar
-from server.data import kdtree, nodes, graph, rtree, get_edge_id, set_block_value, set_flood_value, set_traffic_value, \
-    set_oneway_value
-from server.dfs import dfs_algo
+from server.algorithm import astar, dfs, ids, gbfs, ucs, bfs
+from server.data import (kdtree, nodes, graph, rtree, get_edge_id, set_block_value, set_flood_value, set_traffic_value,
+                         set_oneway_value)
 from server.respone import make_response
 
 def find_nearest_node(lat, lng):
@@ -34,7 +31,7 @@ data = {
             'set': False
         },
     'mode': 'guest',
-    'algorithm': 'dijkstra',
+    'algorithm': '',
     'selecting': '',
     'zones': {
         'block': {},
@@ -75,14 +72,21 @@ def refresh_guest_service(frontendData):
 def find_path():
     path = []
     length = 0
+    cost = 0
+    u = data['start']['id']
+    v = data['end']['id']
     if data['algorithm'] == 'dfs':
-        path, length = dfs_algo(data['start']['id'], data['end']['id'], graph)
-    elif data['algorithm'] == 'astar':
-        path, length = astar(data['start']['id'], data['end']['id'])
+        path, length, cost = dfs(u, v)
     elif data['algorithm'] == 'bfs':
-        print(f'algorithm {data['algorithm']} not installed')
-    elif data['algorithm'] == 'dijkstra':
-        print(f'algorithm {data['algorithm']} not installed')
+        path, length, cost = bfs(u, v)
+    elif data['algorithm'] == 'ids':
+        path, length, cost = ids(u, v)
+    elif data['algorithm'] == 'gbfs':
+        path, length, cost = gbfs(u, v)
+    elif data['algorithm'] == 'ucs':
+        path, length, cost = ucs(u, v)
+    elif data['algorithm'] == 'astar':
+        path, length, cost = astar(u, v)
     else:
         print(f'algorithm {data['algorithm']} not installed')
 
@@ -95,7 +99,7 @@ def find_path():
         lng = nodes.iloc[node_id]['lng']
         path2.append([float(lat), float(lng)])
 
-    return path2, length
+    return path2, length, cost
 
 # find_path()
 
