@@ -1,4 +1,5 @@
 import {
+    changeCoeffFetch,
     delete_zone,
     edgePolyLines,
     findPath,
@@ -6,8 +7,8 @@ import {
     getNearestPoint,
     nodeLayer,
     postBoundary,
-    refreshGuest,
-    sendData
+    refreshGuest, reset_admin,
+    sendData, set_one_way
 } from "./api.js";
 import {map} from "./map.js";
 import {adminPanel, guestPanel, switchAdmin, switchGuest} from "./event_listener.js";
@@ -189,6 +190,8 @@ export async function handleFindPathBtn(e){
             color: 'blue',
             weight: 4
         }).addTo(map);
+        document.getElementById("pathLength")
+            .textContent = `${backendData.length} m`
         console.log("da tim duong di")
     }
 }
@@ -201,7 +204,7 @@ export function setEnd(e){
     data.selecting = 'end'
 }
 
-function showAlert(message){
+export function showAlert(message){
     Toastify({
         text: message,
         duration: 3000,
@@ -216,26 +219,49 @@ function showAlert(message){
 }
 
 //admin functions
+function getEdgeColorByCoeff(coeff) {
+    // coeff từ 1 → 5
+    const colors = [
+        "#cce5ff", // 1 nhạt
+        "#99ccff", // 2
+        "#66b2ff", // 3
+        "#3399ff", // 4
+        "#0066ff"  // 5 đậm
+    ];
+    return colors[Math.min(Math.max(coeff, 1), 5) - 1];
+}
+
 export async function drawPolygon(type) {
     const drawControl = new L.Draw.Polygon(map);
     drawControl.enable();
 
     map.once(L.Draw.Event.CREATED, async (e) => {
         const layer = e.layer
-        layer.setStyle({color: zoneColors[type], fillOpacity: 0.4})
-        layer.addTo(map)
+        layer.setStyle({color: zoneColors[type], fillOpacity: 0.2})
         let id = String(Date.now()%1000)
         while(draw_zones[type].has(id)) id = String(Date.now()%1000)
-        draw_zones[type].set(id, layer)
-        renderZoneList(type)
 
         const boundary = layer.getLatLngs()[0]
         await sendData(data)
         const selected_edges = await postBoundary({boundary, type, id})
+        if(!selected_edges){
+
+            return
+        }
+        draw_zones[type].set(id, layer)
+        layer.addTo(map)
+        renderZoneList(type)
         data = await getData()
-        console.log(data)
-        selected_edges.forEach(edge => {
-            edgePolyLines[edge[2]].setStyle({color: "black", weight: 3});
+
+        let coeff = data.zones[type][id][2]
+        if(type === 'oneway'){
+            draw_one_way(selected_edges)
+        }
+        else selected_edges.forEach(edge => {
+            edgePolyLines[edge[2]].setStyle({
+                color: getEdgeColorByCoeff(coeff),
+                weight: 5
+            });
         });
     });
 }
@@ -250,18 +276,84 @@ export function renderZoneList(type) {
 
     const list = document.getElementById(listId);
     list.innerHTML = "";
+
     draw_zones[type].forEach((z, id) => {
         const li = document.createElement("li");
+        li.style.display = "flex";
+        li.style.alignItems = "center";
+        li.style.gap = "12px";
+
+        // Tên vùng
         const span = document.createElement("span");
         span.textContent = `${type.toUpperCase()} #${id}`;
         li.appendChild(span);
+
+        // 🔹 flood / traffic: label + input hệ số
+        if (type === "flood" || type === "traffic") {
+            const wrapper = document.createElement("div");
+            wrapper.style.display = "flex";
+            wrapper.style.alignItems = "center";
+            wrapper.style.gap = "4px";
+
+            const label = document.createElement("span");
+            label.textContent = "Hệ số:";
+
+            const input = document.createElement("input");
+            input.type = "number";
+            input.step = "1";
+            input.min = "1";
+            input.max = "5";
+            input.value = 1;
+            input.classList.add("zone-coeff-input");
+
+            input.addEventListener("change", () => {
+                changeCoeff(type, id, Number(input.value))
+            });
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            li.appendChild(wrapper);
+        }
+
+        // 🔹 oneway: checkbox đảo chiều
+        if (type === "oneway") {
+            const wrapper = document.createElement("div");
+            wrapper.style.display = "flex";
+            wrapper.style.alignItems = "center";
+            wrapper.style.gap = "4px";
+
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = 'Đổi chiều'
+            btn.classList.add("zone-delete-btn");
+            btn.addEventListener("click", () => {
+                invert_way(type, id)
+            });
+
+            wrapper.appendChild(btn);
+            li.appendChild(wrapper);
+        }
+
+        // Nút Xóa
         const btn = document.createElement("button");
         btn.textContent = "Xóa";
-        btn.addEventListener("click", () => {
-            removeZone(type, id);
-        });
+        btn.classList.add("zone-delete-btn");
+        btn.addEventListener("click", () => removeZone(type, id));
         li.appendChild(btn);
+
         list.appendChild(li);
+    });
+}
+
+export async function changeCoeff(type, id, newCoeff){
+    data.zones[type][id][2] = newCoeff
+    await changeCoeffFetch(type, id, data)
+    let selected_edges = data.zones[type][id][1]
+    selected_edges.forEach(edge => {
+        edgePolyLines[edge[2]].setStyle({
+            color: getEdgeColorByCoeff(newCoeff),
+            weight: 5
+        });
     });
 }
 
@@ -270,11 +362,14 @@ export async function removeZone(type, id) {
     map.removeLayer(draw_zones[type].get(id));
     draw_zones[type].delete(id)
     renderZoneList(type);
-    console.log(data.zones[type])
     let selected_edges = data.zones[type][id][1]
     selected_edges.forEach(edge => {
         edgePolyLines[edge[2]].setStyle({color: "green", weight: 3});
     });
+    if(type === 'oneway'){
+        remove_one_way(data.zones[type][id][1])
+        remove_one_way(data.zones[type][id][3])
+    }
     data.zones = await delete_zone({id, type})
 }
 
@@ -308,12 +403,25 @@ export function nodeUIHandle(e, mode){
     }
 }
 
-export function resetAdmin(e){
+export async function resetAdmin(e){
     Object.keys(draw_zones).forEach(type => {
-        draw_zones[type].forEach(z => map.removeLayer(z.layer));
-        draw_zones[type].clear();
+        const zoneMap = draw_zones[type]; // Đây là Map()
+        zoneMap.forEach((z, id) => {
+            let selected_edges = data.zones[type][id][1]
+            selected_edges.forEach(edge => {
+                edgePolyLines[edge[2]].setStyle({color: "green", weight: 3});
+            });
+            if(type === 'oneway'){
+                remove_one_way(data.zones[type][id][1])
+                remove_one_way(data.zones[type][id][3])
+            }
+            map.removeLayer(z);
+        });
+        zoneMap.clear();
         renderZoneList(type);
     });
+    data = await reset_admin()
+
 }
 
 export function buttonClickAdmin(btn){
@@ -327,5 +435,76 @@ export function buttonClickAdmin(btn){
             const p = b.nextElementSibling;
             if (p) p.classList.add("hidden");
         }
+    });
+}
+
+export async function invert_way(type, id){
+    data.zones[type][id][2] = !data.zones[type][id][2]
+    let edge = data.zones[type][id][1]
+    let invert = data.zones[type][id][3]
+    data = await set_one_way(type, id, data)
+    if(!data.zones[type][id][2]){
+        remove_one_way(invert)
+        draw_one_way(edge)
+    }else{
+        draw_one_way(invert)
+        remove_one_way(edge)
+    }
+}
+
+export function remove_one_way(edges){
+    edges.forEach(edge => {
+        const id = edge[2];
+        const poly = edgePolyLines[id];
+        if (poly._arrow) {
+            map.removeLayer(poly._arrow);
+        }
+        poly.setStyle({
+            color: 'green',
+            weight: 2
+        });
+    })
+}
+export function draw_one_way(edges){
+    edges.forEach(edge => {
+        const id = edge[2];
+        const poly = edgePolyLines[id];
+
+        // đổi màu cạnh
+        poly.setStyle({
+            color: getEdgeColorByCoeff(5),
+            weight: 5
+        });
+
+        // xoá arrow cũ nếu có
+        if (poly._arrow) {
+            map.removeLayer(poly._arrow);
+        }
+
+        // tạo arrow head ở giữa cạnh
+        const arrow = L.polylineDecorator(poly, {
+            patterns: [
+                {
+                    offset: '50%',     // 50% = giữa
+                    repeat: 0,         // chỉ 1 mũi tên
+                    symbol: L.Symbol.arrowHead({
+                        pixelSize: 12,
+                        headAngle: 45,
+                        pathOptions: {
+                            stroke: true,
+                            color: getEdgeColorByCoeff(5),
+                            weight: 2,
+                            fill: true,                       // ⬅️ bật fill
+                            fillColor: getEdgeColorByCoeff(5),  // ⬅️ màu bên trong
+                            fillOpacity: 1
+                        }
+
+                    })
+                }
+            ]
+        }).addTo(map);
+
+        // lưu lại để sau có thể xoá hoặc update
+        poly._arrow = arrow;
     });
 }

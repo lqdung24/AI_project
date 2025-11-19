@@ -1,3 +1,5 @@
+import math
+
 from server.data import get_adj, get_cost
 
 def dfs_algo(start, end, graph):
@@ -15,6 +17,9 @@ def dfs_algo(start, end, graph):
 
         for v in get_adj(u):
             if v not in visited:
+                if get_cost(u, v) == math.inf:
+                    visited.add(v)
+                    continue
                 length += get_cost(u, v)
                 if dfs(v):
                     return True

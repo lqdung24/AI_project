@@ -1,10 +1,11 @@
 import os
 from flask import Flask, request, send_from_directory
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 from server import service
 from server.respone import make_response
-from server.service import node_input, find_path, refresh_guest_service, data, find_inside_edge, delete_zone
+from server.service import node_input, find_path, refresh_guest_service, data, find_inside_edge, delete_zone, \
+    update_zone_coeff, delete_all_zones, update_oneway_service
 
 app = Flask(__name__)
 CORS(app)
@@ -76,10 +77,12 @@ def update_data():
 def get_inside_nodes():
     req = request.get_json()
     result = find_inside_edge(req.get('data'))
-    print(service.data['zones'])
+    if result is None and req.get('data')['type'] == 'oneway':
+        return make_response('error',message='path is branching', code=400)
     return make_response(data=result)
 
-@app.route('/admin/zones/', methods=['DELETE'])
+@app.route('/admin/zones', methods=['DELETE'])
+@cross_origin()
 def delete_zones():
     req = request.get_json()
     id = req.get('data')['id']
@@ -88,6 +91,29 @@ def delete_zones():
     if result is None:
         return make_response(message="zone not found", code=404)
     return make_response(data=result)
+
+@app.route('/admin/zones/coeff', methods=['POST'])
+def update_coeff():
+    req = request.get_json()
+    id = req.get('data')['id']
+    type = req.get('data')['type']
+    service.data = req.get('data')['data']
+    update_zone_coeff(type, id)
+    return make_response()
+
+@app.route('/admin/zones/oneway', methods=['POST'])
+def update_oneway():
+    req = request.get_json()
+    id = req.get('data')['id']
+    type = req.get('data')['type']
+    service.data = req.get('data')['data']
+    update_oneway_service(type, id)
+    return make_response(data=service.data)
+@app.route('/admin/reset', methods=["DELETE"])
+def reset_admin():
+    delete_all_zones()
+    return make_response(data=service.data)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

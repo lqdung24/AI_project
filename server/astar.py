@@ -1,6 +1,5 @@
 import heapq
 import math
-
 from server.data import getLatLng
 
 

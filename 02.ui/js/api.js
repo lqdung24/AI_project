@@ -1,5 +1,5 @@
 import {map} from "./map.js";
-
+import {showAlert} from './functions.js'
 export const API_URL='http://localhost:8000'
 
 export async function getNearestPoint(node) {
@@ -10,7 +10,7 @@ export async function getNearestPoint(node) {
     }).catch(err => console.error("Fetch error:", err));
 
     const resData = await res.json()
-    console.log(resData.data)
+    //console.log(resData.data)
     return resData.data
 }
 
@@ -22,7 +22,7 @@ export async function refreshGuest(data){
     }).catch(err => console.error("Fetch error:", err));
 
     const resData = await res.json()
-    console.log(resData.data)
+    //console.log(resData.data)
     return resData.data
 }
 
@@ -35,7 +35,7 @@ export async function findPath(data){
     }).catch(err => console.error("Fetch error:", err));
 
     const resData = await res.json()
-    console.log(resData.data)
+    //console.log(resData.data)
     return resData.data
 }
 
@@ -47,7 +47,7 @@ export async function sendData(data){
     }).catch(err => console.error("Fetch error:", err));
 
     const resData = await res.json()
-    console.log(resData.data)
+    //console.log(resData.data)
     return resData.data
 }
 
@@ -71,23 +71,38 @@ export async function send_fetch(url, method, data){
     }
 
     const resData = await res.json()
-    console.log(resData.data)
+    //console.log(resData.data)
     return resData.data;
 }
 
 //admin function
+export async function set_one_way(type, id, data){
+    return send_fetch('/admin/zones/oneway', 'POST', {type, id, data})
+}
+export async function changeCoeffFetch(type, id, data){
+    return send_fetch('/admin/zones/coeff', 'POST', {type, id, data})
+}
 export async function delete_zone(data){
-    return send_fetch('/admin/zones/', 'DELETE', data)
+    return send_fetch('/admin/zones', 'DELETE', data)
+}
+export async function reset_admin(){
+    return send_fetch('/admin/reset', 'DELETE', {})
 }
 export async function postBoundary(data){
     const res = await fetch(`${API_URL}/admin/zones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({'data': data})
-    }).catch(err => console.error("Fetch error:", err));
+    }).catch(err => {
+        console.error("Fetch error:", err)
+    });
 
+    if (!res.ok){
+        showAlert('Vui lòng chọn đường không phân nhánh')
+        return
+    }
     const resData = await res.json()
-    console.log(resData.data)
+    //console.log(resData.data)
     return resData.data
 }
 

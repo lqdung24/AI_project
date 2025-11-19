@@ -74,3 +74,4 @@ if not os.path.exists('./data/rtree.idx'):
     rtree = index.Index('./data/rtree', properties=p)
     for row in nodes.itertuples(index=False):
         rtree.insert(row.id, (row.lat, row.lng, row.lat, row.lng))
+

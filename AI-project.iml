@@ -12,5 +12,6 @@
     <orderEntry type="library" name="PapaParse" level="application" />
     <orderEntry type="library" name="toastify-js" level="application" />
     <orderEntry type="library" name="leaflet-draw" level="application" />
+    <orderEntry type="library" name="leaflet-polylinedecorator" level="application" />
   </component>
 </module>

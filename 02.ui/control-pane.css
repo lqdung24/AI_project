@@ -434,3 +434,55 @@ input:checked + .slider:before { transform: translateX(26px); }
     align-items: center;
     gap: 8px;
 }
+
+/* Li zone list */
+#blockedList li,
+#floodList li,
+#trafficList li,
+#onewayList li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: nowrap; /* Không xuống dòng */
+}
+
+/* Wrapper input/checkbox + label */
+#floodList li div,
+#trafficList li div,
+#onewayList li div {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Input hệ số */
+.zone-coeff-input {
+    width: 50px;
+    padding: 2px 4px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Checkbox */
+#onewayList li input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+/* Nút Xóa */
+.zone-delete-btn {
+    padding: 4px 8px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.zone-delete-btn:hover {
+    background: #e63939;
+}
