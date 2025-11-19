@@ -46,7 +46,11 @@ if not os.path.exists('data/adj.pkl'):
     for idx, row in edges.iterrows():
         u, v, cur_w = int(row['u']), int(row['v']), row['length']
         default_w = cur_w
-        adj[u][v] = array('d', [cur_w, default_w, idx])
+        block = False
+        traffic_coeff = 0
+        flood_coeff = 0
+        oneway = False
+        adj[u][v] = [cur_w, block, traffic_coeff, flood_coeff, oneway, default_w,idx]
 
     with open("data/adj.pkl", 'wb') as f:
         pickle.dump(adj, f)

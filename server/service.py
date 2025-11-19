@@ -3,7 +3,8 @@ from collections import defaultdict
 
 from shapely import Polygon, Point
 from server.astar import astar
-from server.data import kdtree, nodes, graph, rtree
+from server.data import kdtree, nodes, graph, rtree, get_edge_id, set_block_value, set_flood_value, set_traffic_value, \
+    set_oneway_value
 from server.dfs import dfs_algo
 from server.respone import make_response
 
@@ -77,7 +78,7 @@ def find_path():
     if data['algorithm'] == 'dfs':
         path, length = dfs_algo(data['start']['id'], data['end']['id'], graph)
     elif data['algorithm'] == 'astar':
-        path, length = astar(data['start']['id'], data['end']['id'], graph)
+        path, length = astar(data['start']['id'], data['end']['id'])
     elif data['algorithm'] == 'bfs':
         print(f'algorithm {data['algorithm']} not installed')
     elif data['algorithm'] == 'dijkstra':
@@ -120,7 +121,7 @@ def find_inside_edge(poly):
     for u in inside_nodes:
         for v in graph[u]:
             if v in inside_nodes:
-                selected_edges.append((u, v, graph[u][v][2]))
+                selected_edges.append((u, v, get_edge_id(u, v)))
                 update_edge_cost(u, v, type, 1)
     data['zones'][type][id] = (boundary, selected_edges, coeff)
     return selected_edges
@@ -160,17 +161,19 @@ def set_one_way_road(nodes):
         u = flow[i]
         v = flow[i+1]
         update_edge_cost(u, v, 'oneway')
-        edges.append((u, v, graph[u][v][2]))
-        invert_edges.append((v, u, graph[v][u][2]))
+        edges.append((u, v, get_edge_id(u, v)))
+        invert_edges.append((v, u, get_edge_id(v, u)))
     return edges, invert_edges
 def update_edge_cost(u, v, type, coeff=1):
     if type == 'block':
-        graph[u][v][0] = math.inf
-    elif type == 'flood' or type == 'traffic':
-        graph[u][v][0] = graph[u][v][1]*pow(2, coeff)
+        set_block_value(u, v, True)
+    elif type == 'flood':
+        set_flood_value(u, v, coeff)
+    elif type == 'traffic':
+        set_traffic_value(u, v, coeff)
     elif type == 'oneway':
-        graph[u][v][0] = graph[u][v][1]
-        graph[v][u][0] = math.inf
+        set_oneway_value(u, v, False)
+        set_oneway_value(v, u, True)
 def update_zone_coeff(type, id):
     selected_edges = data['zones'][type][id][1]
     coeff = data['zones'][type][id][2]
@@ -180,17 +183,27 @@ def delete_zone(id, type):
     zone = data['zones'][type].pop(id, None)
     if zone is None:
         return None
-    edges = zone[1]
-    for edge in edges:
-        u = edge[0]
-        v = edge[1]
-        graph[u][v][0] = graph[u][v][1]
-
-    if type == 'oneway':
-        for edge in zone[3]:
+    if type == 'block':
+        for edge in zone[1]:
             u = edge[0]
             v = edge[1]
-            graph[u][v][0] = graph[u][v][1]
+            set_block_value(u, v, False)
+    elif type == 'traffic':
+        for edge in zone[1]:
+            u = edge[0]
+            v = edge[1]
+            set_traffic_value(u, v, 0)
+    elif type == 'flood':
+        for edge in zone[1]:
+            u = edge[0]
+            v = edge[1]
+            set_flood_value(u, v, 0)
+    elif type == 'oneway':
+        for edge in zone[1]:
+            u = edge[0]
+            v = edge[1]
+            set_oneway_value(u, v, False)
+            set_oneway_value(v, u, False)
     return data['zones']
 
 def delete_all_zones():
