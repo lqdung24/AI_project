@@ -1,0 +1,65 @@
+<div id="adminPanel" class="control-panel">
+    <h3>⚙️ Bảng điều khiển (Admin)</h3>
+    <div class="row switch-container">
+        <span>Guest</span>
+        <label class="switch">
+            <input type="checkbox" id="modeSwitchAdmin" checked>
+            <span class="slider"></span>
+        </label>
+        <span>Admin</span>
+    </div>
+
+    <!-- Hiển thị Node / Edge -->
+    <div class="row switch-container" style="justify-content: space-between;">
+        <div class="switch-item">
+            <span>Node</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleNodeAdmin" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="switch-item">
+            <span>Edge</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleEdgeAdmin" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="row">
+        <button id="blockRoadBtn" class="toggle-btn">🚧 Cấm đường</button>
+        <div id="blockRoadPanel" class="submenu hidden">
+            <ul id="blockedList"></ul>
+            <button id="createBlockZone">+ Tạo vùng cấm</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <button id="floodBtn" class="toggle-btn">🌊 Ngập lụt</button>
+        <div id="floodPanel" class="submenu hidden">
+            <ul id="floodList"></ul>
+            <button id="createFloodZone">+ Tạo vùng ngập</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <button id="trafficJamBtn" class="toggle-btn">🚗 Tắc đường</button>
+        <div id="trafficPanel" class="submenu hidden">
+            <ul id="trafficList"></ul>
+            <button id="createTrafficZone">+ Tạo vùng tắc</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <button id="oneWayBtn" class="toggle-btn">➡️ Đường 1 chiều</button>
+        <div id="onewayPanel" class="submenu hidden">
+            <ul id="onewayList"></ul>
+            <button id="createOnewayZone">+ Tạo vùng 1 chiều</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <button id="resetAdmin">🗑️ Reset tất cả</button>
+    </div>
+</div>

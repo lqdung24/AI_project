@@ -18,7 +18,7 @@ G = ox.graph_from_polygon(
 # Lấy node và edge dưới dạng DataFrame
 nodes, edges = ox.graph_to_gdfs(G)
 
-#vẽ thử map
+#vẽ thử main
 ox.plot_graph(G, node_color='r', node_size=10, edge_color='gray')
 
 # thêm cột id làm index cho mảng sau này

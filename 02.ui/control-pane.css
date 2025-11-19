@@ -1,0 +1,488 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    height: 100vh;
+    background: #eef3f9;
+}
+
+.control-panel {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 280px;
+    background: linear-gradient(160deg, #ffffff 0%, #f3f7ff 100%);
+    border-radius: 18px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.control-panel h3 {
+    text-align: center;
+    margin: 0 0 14px 0;
+    font-size: 19px;
+    color: #2b3a67;
+}
+
+.row {
+    margin: 12px 0;
+}
+
+.label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+    color: #555;
+}
+
+.switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 28px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: #0078ff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+select, input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+input:focus, select:focus {
+    border-color: #0078ff;
+    box-shadow: 0 0 6px rgba(0, 120, 255, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+#findPathBtn {
+    background: #0078ff;
+    color: white;
+}
+
+#findPathBtn:hover {
+    background: #005fd1;
+}
+
+#refreshBtn {
+    background: #f44336;
+    color: white;
+}
+
+#refreshBtn:hover {
+    background: #d32f2f;
+}
+
+/* Leaflet marker bên cạnh input */
+.input-with-marker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.leaflet-marker {
+    width: 22px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.admin-panel {
+    margin-top: 16px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.admin-panel h4 {
+    margin: 6px 0 12px;
+    text-align: center;
+    color: #2b3a67;
+}
+
+#blockRoadBtn, #floodBtn, #trafficJamBtn, #oneWayBtn {
+    background: #ffa500;
+    color: white;
+}
+
+#blockRoadBtn:hover, #floodBtn:hover, #trafficJamBtn:hover, #oneWayBtn:hover {
+    background: #e59400;
+}
+
+.result-panel {
+    margin-top: 16px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.result-panel h4 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+}
+
+.result-panel p {
+    margin: 4px 0;
+}
+
+/*admin*/
+/* Gốc */
+#map {
+    width: 100%;
+    height: 100vh;
+}
+
+/* Panel chính */
+.control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 280px;
+    /* Nền gradient tinh tế hơn */
+    background: linear-gradient(160deg, #ffffff 0%, #f4f7ff 100%);
+    border-radius: 16px;
+    /* Bóng đổ mềm mại hơn */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0; /* Thêm viền nhẹ cho sắc nét */
+    padding: 20px;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.control-panel h3 {
+    text-align: center;
+    margin: 0 0 16px;
+    /* Màu xanh chàm (indigo) đậm, hiện đại */
+    color: #1d4ed8;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Label và layout */
+.row { margin: 12px 0; }
+.label {
+    font-size: 14px;
+    /* Màu xám-slate, dễ đọc */
+    color: #475569;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500; /* Đậm vừa phải */
+}
+
+/* Button tổng quát (Nút phụ) */
+button {
+    width: 100%;
+    padding: 10px 12px;
+    /* Viền màu xanh nhạt */
+    border: 1px solid #c7d2fe;
+    border-radius: 10px;
+    cursor: pointer;
+    /* Nền màu chàm rất nhạt */
+    background: #eef2ff;
+    /* Chữ màu chàm đậm (tương phản tốt) */
+    color: #3730a3;
+    transition: 0.25s;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+button:hover {
+    /* Nền đậm hơn khi hover */
+    background: #e0e7ff;
+    transform: translateY(-1px);
+}
+
+/* Nút chính (Tìm đường) */
+#findPathBtn {
+    /* Màu xanh (blue) chính, mạnh mẽ hơn */
+    background: #2563eb;
+    border: none;
+    color: white;
+    /* Thêm bóng đổ nhẹ cho nút chính */
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+#findPathBtn:hover {
+    background: #1d4ed8; /* Đậm hơn khi hover */
+    box-shadow: 0 5px 15px rgba(29, 78, 216, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Nút làm mới (Nguy hiểm) */
+#refreshBtn {
+    /* Màu đỏ (red) mạnh mẽ hơn */
+    background: #dc2626;
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+#refreshBtn:hover {
+    background: #b91c1c; /* Đỏ đậm hơn khi hover */
+    box-shadow: 0 5px 15px rgba(185, 28, 28, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Nút chức năng admin (cũng là nút chính) */
+#blockRoadBtn, #floodBtn, #trafficJamBtn, #oneWayBtn {
+    /* Thống nhất với màu xanh chính */
+    background: #3b82f6;
+    border: none;
+    color: white;
+}
+#blockRoadBtn:hover, #floodBtn:hover, #trafficJamBtn:hover, #oneWayBtn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Toggle nút chính */
+.toggle-btn.active {
+    background: #2563eb; /* Thống nhất màu active */
+    color: white;
+    border-color: #2563eb;
+}
+
+/* Submenu */
+.submenu {
+    margin-top: 8px;
+    /* Nền trắng xám, đồng nhất với panel kết quả */
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 8px;
+    /* Bóng đổ trong nhẹ nhàng */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+.submenu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+}
+.submenu li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    /* Nền trắng, sạch sẽ */
+    background: #ffffff;
+    border: 1px solid #e2e8f0; /* Viền xám nhạt */
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+.submenu li button {
+    width: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+    background: #3b82f6; /* Nút trong submenu */
+    color: white;
+    border-radius: 8px;
+    border: none;
+}
+.submenu li button:hover { background: #2563eb; }
+
+/* Switch (Giữ nguyên, đã đẹp) */
+.switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.switch {
+    position: relative;
+    width: 50px;
+    height: 24px;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute;
+    inset: 0;
+    background-color: #cbd5e1;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: .4s;
+}
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+input:checked + .slider { background-color: #2563eb; } /* Thống nhất màu */
+input:checked + .slider:before { transform: translateX(26px); }
+
+.hidden { display: none; }
+
+/* Panel kết quả */
+.result-panel {
+    margin-top: 14px;
+    padding: 12px;
+    background: #f8fafc; /* Nền đồng nhất với submenu */
+    border-radius: 10px;
+    border: 1px solid #e2e8f0; /* Viền đồng nhất */
+}
+.result-panel h4 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: #1d4ed8; /* Thống nhất màu tiêu đề */
+    font-weight: 600;
+}
+.result-panel p {
+    margin: 4px 0;
+    color: #334155; /* Màu text chính, dễ đọc */
+}
+
+/* Input + marker cùng hàng */
+.input-with-marker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.input-with-marker img {
+    width: 22px;
+    height: 36px;
+}
+.input-with-marker input {
+    flex: 1;
+    padding: 9px 12px;
+    /* Viền xám slate mặc định, rõ ràng */
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-with-marker input:focus {
+    /* Viền xanh chính khi focus */
+    border-color: #2563eb;
+    /* Hiệu ứng glow "outline" hiện đại */
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.switch-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Li zone list */
+#blockedList li,
+#floodList li,
+#trafficList li,
+#onewayList li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: nowrap; /* Không xuống dòng */
+}
+
+/* Wrapper input/checkbox + label */
+#floodList li div,
+#trafficList li div,
+#onewayList li div {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Input hệ số */
+.zone-coeff-input {
+    width: 50px;
+    padding: 2px 4px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Checkbox */
+#onewayList li input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+/* Nút Xóa */
+.zone-delete-btn {
+    padding: 4px 8px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.zone-delete-btn:hover {
+    background: #e63939;
+}
