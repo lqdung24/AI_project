@@ -18,7 +18,7 @@ if not os.path.exists(DATA_DIR):
 
 @app.route('/data', methods=['POST'])
 def get_data():
-    #print(service.data)
+    # print(service.data)
     return make_response(data=service.data)
 
 @app.route("/data/nodes", methods=["GET"])

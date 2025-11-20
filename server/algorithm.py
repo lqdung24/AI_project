@@ -40,9 +40,11 @@ def dfs(start, goal):
             return path, total_len, total_cost
 
         for neighbor in get_adj(node):
+            if get_cost(node, neighbor) == math.inf:
+                continue
             stack.append((neighbor, path + [neighbor]))
 
-    return None, 0, 0
+    return [], 0, 0
 
 
 # ===============================
@@ -63,9 +65,11 @@ def bfs(start, goal):
             return path, total_len, total_cost
 
         for neighbor in get_adj(node):
+            if get_cost(node, neighbor) == math.inf:
+                continue
             queue.append((neighbor, path + [neighbor]))
 
-    return None, 0, 0
+    return [], 0, 0
 
 
 # ===============================
@@ -80,6 +84,8 @@ def dls(node, goal, limit, path, visited):
     visited.add(node)
 
     for neighbor in get_adj(node):
+        if get_cost(node, neighbor) == math.inf:
+            continue
         if neighbor not in visited:
             result = dls(neighbor, goal, limit - 1, path + [neighbor], visited)
             if result:
@@ -94,7 +100,7 @@ def ids(start, goal, max_depth=10000):
         if result:
             total_len, total_cost = evaluate_path(result)
             return result, total_len, total_cost
-    return None, 0, 0
+    return [], 0, 0
 
 
 # ===============================
@@ -116,9 +122,11 @@ def gbfs(start, goal):
             return path, total_len, total_cost
 
         for neighbor in get_adj(node):
+            if get_cost(node, neighbor) == math.inf:
+                continue
             heapq.heappush(pq, (get_h(neighbor, goal), neighbor, path + [neighbor]))
 
-    return None, 0, 0
+    return [], 0, 0
 
 
 # ===============================
@@ -142,10 +150,12 @@ def ucs(start, goal):
             return path, total_len, total_cost
 
         for neighbor in get_adj(node):
+            if get_cost(node, neighbor) == math.inf:
+                continue
             new_cost = cost + get_cost(node, neighbor)
             heapq.heappush(pq, (new_cost, neighbor, path + [neighbor]))
 
-    return None, 0, 0
+    return [], 0, 0
 
 def astar(start, goal):
     # priority queue: (f = g + h, g, node, path)
@@ -162,6 +172,8 @@ def astar(start, goal):
             return path, total_len, total_cost
 
         for neighbor in get_adj(node):
+            if get_cost(node, neighbor) == math.inf:
+                continue
             new_g = g + get_cost(node, neighbor)
 
             # Nếu tìm được đường tốt hơn đến neighbor → cập nhật
@@ -171,4 +183,4 @@ def astar(start, goal):
                 new_f = new_g + h
                 heapq.heappush(pq, (new_f, new_g, neighbor, path + [neighbor]))
 
-    return None, 0, 0
+    return [], 0, 0

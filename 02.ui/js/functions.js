@@ -74,6 +74,8 @@ let endMarker;
 let pathDraw;
 export async function __init__(){
     data = await getData()
+    map.removeLayer(edgeLayer)
+    map.removeLayer(nodeLayer)
 }
 export function handleNode(e){
     const {lat, lng} = e.latlng;
@@ -192,17 +194,25 @@ export async function handleFindPathBtn(e){
         }).addTo(map);
         document.getElementById("pathLength")
             .textContent = `${backendData.length} m`
-        let time_unit = 'hours'
-        if(backendData.cost < 1){
+        let hours = 0, minutes = 0, seconds = 0;
+        console.log(backendData.cost*60)
+        hours = Math.floor(backendData.cost)
+        backendData.cost -= hours
+        if(backendData.cost < 1 && backendData.cost > 0){
             backendData.cost *= 60;
-            time_unit = 'minutes'
+            minutes = Math.floor(backendData.cost)
+            backendData.cost -= minutes
         }
-        if(backendData.cost < 1){
+        if(backendData.cost < 1 && backendData.cost > 0){
             backendData.cost *= 60;
-            time_unit = 'seconds'
+            seconds = Math.floor(backendData.cost)
         }
+        let text = ''
+        if(hours) text += `${hours} h `
+        if(minutes) text += `${minutes} m `
+        if(seconds) text += `${seconds} s`
         document.getElementById("pathTime")
-            .textContent = `${Math.round(backendData.cost)} ${time_unit}`
+            .textContent = text
         console.log("da tim duong di")
     }
 }
