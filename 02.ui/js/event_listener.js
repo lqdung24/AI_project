@@ -1,6 +1,6 @@
 import {map} from "./map.js";
 import {
-    drawPolygon,
+    create_polygon,
     handleChangeAlgorithm,
     handleChangeMode,
     handleFindPathBtn,
@@ -55,13 +55,15 @@ export function initEventListener() {
     });
 
     document.getElementById("createBlockZone")
-        .addEventListener("click", () => drawPolygon("block"));
+        .addEventListener("click", () => create_polygon("block", false));
+    document.getElementById("createBlockRoad")
+        .addEventListener("click", () => create_polygon("block", true));
     document.getElementById("createFloodZone")
-        .addEventListener("click", () => drawPolygon("flood"));
-    document.getElementById("createTrafficZone")
-        .addEventListener("click", () => drawPolygon("traffic"));
-    document.getElementById("createOnewayZone")
-        .addEventListener("click", () => drawPolygon("oneway"));
+        .addEventListener("click", () => create_polygon("flood", false));
+    document.getElementById("createTrafficRoad")
+        .addEventListener("click", () => create_polygon("traffic", true));
+    document.getElementById("createOnewayRoad")
+        .addEventListener("click", () => create_polygon("oneway", true));
 
     document.getElementById("resetAdmin")
         .addEventListener("click", resetAdmin);

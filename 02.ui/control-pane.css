@@ -486,3 +486,16 @@ input:checked + .slider:before { transform: translateX(26px); }
 .zone-delete-btn:hover {
     background: #e63939;
 }
+.btn-row {
+    display: flex;
+    gap: 10px;         /* khoảng cách giữa 2 nút */
+    margin-top: 10px;
+}
+
+.limited-list {
+    max-height: 150px;       /* tương đương ~3 item (tùy UI của bạn) */
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 0;
+    list-style: none;
+}

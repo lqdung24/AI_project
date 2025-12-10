@@ -5,8 +5,7 @@ import {
     findPath,
     getData,
     getNearestPoint,
-    nodeLayer,
-    postBoundary,
+    nodeLayer, postBoundary,
     refreshGuest, reset_admin,
     sendData, set_one_way
 } from "./api.js";
@@ -183,11 +182,11 @@ export async function handleFindPathBtn(e){
         showAlert(message)
     }else{
         let backendData = await findPath(data)
+        if(pathDraw) pathDraw.remove();
         if(backendData.length === 0) {
             showAlert("Không tìm thấy đường đi")
             return
         }
-        if(pathDraw) pathDraw.remove();
         pathDraw = L.polyline(backendData.path, {
             color: 'blue',
             weight: 4
@@ -252,7 +251,7 @@ function getEdgeColorByCoeff(coeff) {
     return colors[Math.min(Math.max(coeff, 1), 5) - 1];
 }
 
-export async function drawPolygon(type) {
+export async function create_polygon(type, inside) {
     const drawControl = new L.Draw.Polygon(map);
     drawControl.enable();
 
@@ -264,9 +263,8 @@ export async function drawPolygon(type) {
 
         const boundary = layer.getLatLngs()[0]
         await sendData(data)
-        const selected_edges = await postBoundary({boundary, type, id})
+        const selected_edges = await postBoundary({boundary, type, id}, inside)
         if(!selected_edges){
-
             return
         }
         draw_zones[type].set(id, layer)

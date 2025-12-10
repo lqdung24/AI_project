@@ -30,9 +30,14 @@
     <div class="row">
         <button id="blockRoadBtn" class="toggle-btn">🚧 Cấm đường</button>
         <div id="blockRoadPanel" class="submenu hidden">
-            <ul id="blockedList"></ul>
-            <button id="createBlockZone">+ Tạo vùng cấm</button>
+            <ul id="blockedList" class="limited-list"></ul>
+
+            <div class="btn-row">
+                <button id="createBlockZone">+ Tạo vùng cấm</button>
+                <button id="createBlockRoad">+ Tạo đường cấm</button>
+            </div>
         </div>
+
     </div>
 
     <div class="row">
@@ -47,7 +52,7 @@
         <button id="trafficJamBtn" class="toggle-btn">🚗 Tắc đường</button>
         <div id="trafficPanel" class="submenu hidden">
             <ul id="trafficList"></ul>
-            <button id="createTrafficZone">+ Tạo vùng tắc</button>
+            <button id="createTrafficRoad">+ Tạo đường tắc</button>
         </div>
     </div>
 
@@ -55,7 +60,7 @@
         <button id="oneWayBtn" class="toggle-btn">➡️ Đường 1 chiều</button>
         <div id="onewayPanel" class="submenu hidden">
             <ul id="onewayList"></ul>
-            <button id="createOnewayZone">+ Tạo vùng 1 chiều</button>
+            <button id="createOnewayRoad">+ Chuyển đường chiều</button>
         </div>
     </div>
 

@@ -88,8 +88,14 @@ export async function delete_zone(data){
 export async function reset_admin(){
     return send_fetch('/admin/reset', 'DELETE', {})
 }
-export async function postBoundary(data){
-    const res = await fetch(`${API_URL}/admin/zones`, {
+export async function postBoundary(data, inside){
+    var url
+    if(inside === true){
+        url = `${API_URL}/admin/zones/inside`
+    }else{
+        url = `${API_URL}/admin/zones/cross`
+    }
+    const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({'data': data})
