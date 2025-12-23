@@ -10,7 +10,7 @@ def get_h(id, end_id):
     end = getLatLng(end_id)
     return math.sqrt( (cur[0] - end[0])**2 + (cur[1] - end[1])**2 )
 # -------------------------------------
-# Tính tổng length và cost của một path
+# Tính tổng length và cost của một path hehe
 # -------------------------------------
 def evaluate_path(path):
     total_len = 0
