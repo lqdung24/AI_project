@@ -1,7 +1,8 @@
 import math
+import os
 import pickle
-from pprint import pprint
 import pandas as pd
+from flask import json
 from rtree import index
 
 with open("../00.data/data/kdtree.pkl", "rb") as f:
@@ -15,7 +16,6 @@ with open("../00.data/data/adj.pkl", 'rb') as f:
 rtree = index.Index("../00.data/data/rtree")
 
 coeff_value = [1<<p for p in range(6)]
-print(coeff_value)
 def getLatLng(id):
     node = nodes.iloc[id]
     return node['lat'], node['lng']

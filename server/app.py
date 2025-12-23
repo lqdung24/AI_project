@@ -1,11 +1,11 @@
 import os
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, json
 from flask_cors import CORS, cross_origin
 
 from server import service
 from server.respone import make_response
 from server.service import node_input, find_path, refresh_guest_service, data, find_inside_edge, delete_zone, \
-    update_zone_coeff, delete_all_zones, update_oneway_service
+    update_zone_coeff, delete_all_zones, update_oneway_service, get_crossed_edge
 
 app = Flask(__name__)
 CORS(app)
@@ -73,12 +73,22 @@ def update_data():
     service.data = frontend_data
     return make_response(data=service.data)
 
-@app.route("/admin/zones", methods=['POST'])
+@app.route("/admin/zones/inside", methods=['POST'])
 def get_inside_nodes():
     req = request.get_json()
     result = find_inside_edge(req.get('data'))
     if result is None and req.get('data')['type'] == 'oneway':
         return make_response('error',message='path is branching', code=400)
+
+    return make_response(data=result)
+
+@app.route('/admin/zones/cross', methods=['POST'])
+def create_zones():
+    req = request.get_json()
+    if req.get('data')['type'] == 'oneway' not in ['block', 'flood']:
+        return make_response('error',message='not available for' + req.get('data')['type'], code=400)
+    result = get_crossed_edge(req.get('data'))
+
     return make_response(data=result)
 
 @app.route('/admin/zones', methods=['DELETE'])
@@ -88,9 +98,12 @@ def delete_zones():
     id = req.get('data')['id']
     type = req.get('data')['type']
     result = delete_zone(id, type)
+
     if result is None:
         return make_response(message="zone not found", code=404)
     return make_response(data=result)
+
+
 
 @app.route('/admin/zones/coeff', methods=['POST'])
 def update_coeff():
@@ -109,6 +122,7 @@ def update_oneway():
     service.data = req.get('data')['data']
     update_oneway_service(type, id)
     return make_response(data=service.data)
+
 @app.route('/admin/reset', methods=["DELETE"])
 def reset_admin():
     delete_all_zones()

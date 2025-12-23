@@ -35,7 +35,7 @@ export async function findPath(data){
     }).catch(err => console.error("Fetch error:", err));
 
     const resData = await res.json()
-    //console.log(resData.data)
+    console.log(resData.data)
     return resData.data
 }
 

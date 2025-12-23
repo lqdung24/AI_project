@@ -104,6 +104,7 @@ def find_path():
 # find_path()
 
 def find_inside_edge(poly):
+
     boundary = poly['boundary']
     type = poly['type']
     id = poly['id']
@@ -130,6 +131,23 @@ def find_inside_edge(poly):
     data['zones'][type][id] = (boundary, selected_edges, coeff)
     return selected_edges
 
+def get_crossed_edge(poly):
+    boundary = poly['boundary']
+    type = poly['type']
+    id = poly['id']
+    coeff = 1 if type in('flood') else 5
+    polygon_coords = [(p['lat'], p['lng']) for p in boundary]
+    poly = Polygon(polygon_coords)
+    candidate_ids = rtree.intersection(poly.bounds)
+    candidates = [nodes.iloc[p] for p in candidate_ids]
+    inside_nodes = [int(p['id']) for p in candidates if poly.contains(Point(p['lat'], p['lng']))]
+    selected_edges = []
+    for u in inside_nodes:
+        for v in graph[u]:
+            selected_edges.append((u, v, get_edge_id(u, v)))
+            update_edge_cost(u, v, type, 1)
+    data['zones'][type][id] = (boundary, selected_edges, coeff)
+    return selected_edges
 def set_one_way_road(nodes):
     count = defaultdict(set)
     for u in nodes:

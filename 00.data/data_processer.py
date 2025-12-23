@@ -1,12 +1,15 @@
 import os
 from array import array
 from collections import defaultdict
+from pprint import pprint
+
 from scipy.spatial import KDTree
 import pickle
 import pandas as pd
 from rtree import index
 from shapely.geometry import Point, Polygon
 
+from server.data import graph
 
 # Đọc CSV
 nodes = pd.read_csv("data/nodes.csv")
@@ -54,6 +57,8 @@ if not os.path.exists('data/adj.pkl'):
 
     with open("data/adj.pkl", 'wb') as f:
         pickle.dump(adj, f)
+else:
+    print(graph)
 
 # tạo kd tree để tìm điểm gần nhất với O(log n)
 if not os.path.exists('./data/kdtree.pkl'):
